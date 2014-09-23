@@ -18,37 +18,23 @@ Route::get('/', function()
 	return View::make('hello');
 });
 
-Route::get('/login', function() {
-    return View::make('user/login');
+Route::group(["before"=>"guest"],function() {
+    Route::any("/login", [
+        "as" => "user/login",
+        "uses" => "UserController@loginAction"
+    ]);
 });
 
-Route::post('/login', array('before' => 'csrf', function(){
-    $inputs = Input::only(array('name', 'password'));
+Route::group(["before"=>"auth"],function() {
 
-    if ( Auth::attempt($inputs) ) {
-        return View::make("user/profile");
-    } else {
-        return Redirect::back()->withInput();
-    }
-}));
-
-Route::get('/create-users-table', function() {
-    Schema::create('users', function($table) {
-        $table->increments('id');
-        $table->string('name', 100);
-        $table->string('password', 100);
-        $table->timestamps();
-    });
-
-    $user = new User;
-    $user->name = 'user';
-    $user->password = Hash::make('password');
-    $user->save();
-
-    return 'テーブル作成';
+    Route::any("/profile", [
+        "as"   => "user/profile",
+        "uses" => "UserController@profileAction"
+    ]);
+    Route::any("/logout", [
+        "as"   => "user/logout",
+        "uses" => "UserController@logoutAction"
+    ]);
 });
 
-Route::get('/logout', function(){
-    Auth::logout();
-    return Redirect::to('/');
-});
+
