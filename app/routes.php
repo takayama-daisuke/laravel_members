@@ -50,5 +50,5 @@ Route::get('/create-users-table', function() {
 
 Route::get('/logout', function(){
     Auth::logout();
-    return Redirect::to('/');
+    return Redirect::to('/login');
 });
